@@ -41,15 +41,15 @@
 
     .container {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       background: var(--card-bg);
       border-radius: 20px;
-      padding: 1.5rem;
+      padding: 1.25rem;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.2rem;
+      gap: 1rem;
     }
 
     header {
@@ -58,20 +58,39 @@
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
       color: #1e293b;
     }
 
-    .info-banner {
-      background: #e0e7ff;
-      color: #3730a3;
-      padding: 0.6rem 1rem;
-      border-radius: 10px;
+    .controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 0.5rem;
+      background: #f8fafc;
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .controls-bar label {
       font-size: 0.85rem;
-      font-weight: 600;
-      margin-top: 0.5rem;
-      text-align: center;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .select-grid {
+      padding: 0.4rem 0.6rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: #1e293b;
+      cursor: pointer;
     }
 
     .status-bar {
@@ -79,19 +98,66 @@
       justify-content: space-between;
       width: 100%;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #475569;
       padding: 0 0.25rem;
     }
 
+    /* Panel Daftar Kata Latin */
+    .word-list-container {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .word-list-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .word-list-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      max-height: 100px;
+      overflow-y: auto;
+    }
+
+    .word-badge {
+      padding: 0.25rem 0.55rem;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #334155;
+      transition: all 0.2s ease;
+    }
+
+    .word-badge.found {
+      background: #dcfce7;
+      border-color: #86efac;
+      color: #15803d;
+      text-decoration: line-through;
+    }
+
+    /* Grid Area */
     .grid-container {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       aspect-ratio: 1 / 1;
       background: #e2e8f0;
-      padding: 10px;
+      padding: 8px;
       border-radius: 16px;
       transition: all 0.3s ease;
     }
@@ -99,7 +165,7 @@
     .cell {
       background-color: var(--cell-bg);
       border: 2px solid var(--cell-border);
-      border-radius: 10px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -109,6 +175,8 @@
       cursor: pointer;
       transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.5s ease;
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      line-height: 1;
+      overflow: hidden;
     }
 
     .cell:active {
@@ -127,6 +195,26 @@
       color: #064e3b;
     }
 
+    /* Animasi Petunjuk Red Glow */
+    @keyframes pulseGlowRed {
+      0% {
+        box-shadow: 0 0 8px #ef4444, 0 0 16px #ef4444;
+        background-color: #fca5a5;
+        border-color: #dc2626;
+      }
+      100% {
+        box-shadow: 0 0 20px #dc2626, 0 0 30px #dc2626;
+        background-color: #f87171;
+        border-color: #b91c1c;
+      }
+    }
+
+    .cell.glow-red {
+      animation: pulseGlowRed 0.5s infinite alternate !important;
+      color: #7f1d1d !important;
+      z-index: 10;
+    }
+
     .cell.fade-out {
       opacity: 0;
       visibility: hidden;
@@ -137,24 +225,20 @@
     }
 
     @keyframes pulseGlow {
-      from {
-        box-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80;
-      }
-      to {
-        box-shadow: 0 0 20px #22c55e, 0 0 35px #22c55e;
-      }
+      from { box-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80; }
+      to { box-shadow: 0 0 20px #22c55e, 0 0 35px #22c55e; }
     }
 
     .hint-box {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #0284c7;
       background: #f0f9ff;
       border: 1px solid #bae6fd;
-      padding: 0.6rem 1rem;
+      padding: 0.5rem 0.8rem;
       border-radius: 8px;
       width: 100%;
       text-align: center;
-      min-height: 40px;
+      min-height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -169,9 +253,9 @@
 
     button {
       flex: 1;
-      padding: 0.8rem;
+      padding: 0.75rem;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       border: none;
       border-radius: 12px;
@@ -204,29 +288,47 @@
   <div class="container">
     <header>
       <h1>Cari Kata Aksara Jawa</h1>
-      <div class="info-banner">🔍 Kata yang dicari adalah Kata Dasar Bahasa Indonesia</div>
     </header>
+
+    <div class="controls-bar">
+      <label for="grid-selector">Pilih Ukuran Grid:</label>
+      <select id="grid-selector" class="select-grid" onchange="startNewGame(false)">
+        <option value="random" selected>🎲 Acak (5x5 - 9x9)</option>
+        <option value="5">5 x 5</option>
+        <option value="6">6 x 6</option>
+        <option value="7">7 x 7</option>
+        <option value="8">8 x 8</option>
+        <option value="9">9 x 9</option>
+      </select>
+    </div>
 
     <div class="status-bar">
       <span id="grid-info">Ukuran: -</span>
       <span id="word-count-info">Ditemukan: 0 / 0</span>
     </div>
 
+    <!-- Panel Daftar Kata Latin -->
+    <div class="word-list-container">
+      <div class="word-list-title">Daftar Kata yang Dicari (Bahasa Indonesia)</div>
+      <div id="word-list-badges" class="word-list-badges"></div>
+    </div>
+
+    <!-- Canvas Grid -->
     <div id="grid" class="grid-container"></div>
 
     <div id="hint-display" class="hint-box">Klik "Petunjuk" jika butuh bantuan!</div>
 
     <div class="actions">
       <button id="btn-hint" class="btn-hint" onclick="getHint()">💡 Petunjuk</button>
-      <button id="btn-restart" class="btn-restart" onclick="startNewGame()">🎮 Main Lagi</button>
+      <button id="btn-restart" class="btn-restart" onclick="startNewGame(true)">🎮 Main Lagi</button>
     </div>
   </div>
 
   <script>
     // Database 100 Kata Dasar Bahasa Indonesia tanpa vokal 'O'
     const wordDatabase = [
-      {"latin": "air", "aksara": ["ꦲꦲꦶꦂ"]},
-      {"latin": "api", "aksara": ["ꦲ", "ꦥꦶ"]},
+      {"latin": "air", "aksara": ["ꦄ", "ꦲꦶꦂ"]},
+      {"latin": "api", "aksara": ["ꦄ", "ꦥꦶ"]},
       {"latin": "batu", "aksara": ["ꦧ", "ꦠꦸ"]},
       {"latin": "buku", "aksara": ["ꦧꦸ", "ꦏꦸ"]},
       {"latin": "kayu", "aksara": ["ꦏ", "ꦪꦸ"]},
@@ -234,115 +336,123 @@
       {"latin": "tali", "aksara": ["ꦠ", "ꦭꦶ"]},
       {"latin": "nasi", "aksara": ["ꦤ", "ꦱꦶ"]},
       {"latin": "sapi", "aksara": ["ꦱ", "ꦥꦶ"]},
-      {"latin": "kuda", "aksara": ["ꦏꦸ", "ꦢ"]},
+      {"latin": "kuda", "aksara": ["ꦏꦸ", "ꦝ"]},
       {"latin": "kera", "aksara": ["ꦏꦼ", "ꦫ"]},
       {"latin": "bumi", "aksara": ["ꦧꦸ", "ꦩꦶ"]},
       {"latin": "langit", "aksara": ["ꦭ", "ꦔꦶ", "ꦠ꧀"]},
       {"latin": "laut", "aksara": ["ꦭ", "ꦲꦸ", "ꦠ꧀"]},
       {"latin": "surya", "aksara": ["ꦱꦸꦂ", "ꦪ"]},
       {"latin": "bulan", "aksara": ["ꦧꦸ", "ꦭ", "ꦤ꧀"]},
-      {"latin": "bintang", "aksara": ["ꦧꦶꦤ꧀", "ꦠꦁ"]},
+      {"latin": "bintang", "aksara": ["ꦧꦶ", "ꦤ꧀", "ꦠꦁ"]},
       {"latin": "hujan", "aksara": ["ꦲꦸ", "ꦗ", "ꦤ꧀"]},
-      {"latin": "angin", "aksara": ["ꦲ", "ꦔꦶ", "ꦤ꧀"]},
-      {"latin": "awan", "aksara": ["ꦲ", "ꦮ", "ꦤ꧀"]},
+      {"latin": "angin", "aksara": ["ꦄ", "ꦔꦶ", "ꦤ꧀"]},
+      {"latin": "awan", "aksara": ["ꦄ", "ꦮ", "ꦤ꧀"]},
       {"latin": "tanah", "aksara": ["ꦠ", "ꦤꦃ"]},
       {"latin": "pasir", "aksara": ["ꦥ", "ꦱꦶꦂ"]},
       {"latin": "besi", "aksara": ["ꦧꦼ", "ꦱꦶ"]},
-      {"latin": "emas", "aksara": ["ꦲꦼ", "ꦩ", "ꦱ꧀"]},
-      {"latin": "perak", "aksara": ["ꦥꦼ", "ꦫ", "ꦏ꧀"]},
+      {"latin": "emas", "aksara": ["ꦄꦼ", "ꦩ", "ꦱ꧀"]},
+      {"latin": "perak", "aksara": ["ꦥꦺ", "ꦫ", "ꦏ꧀"]},
       {"latin": "rumah", "aksara": ["ꦫꦸ", "ꦩꦃ"]},
-      {"latin": "pintu", "aksara": ["ꦥꦶꦤ꧀", "ꦠꦸ"]},
-      {"latin": "atap", "aksara": ["ꦲ", "ꦠ", "ꦥ꧀"]},
-      {"latin": "dahi", "aksara": ["ꦢ", "ꦲꦶ"]},
+      {"latin": "pintu", "aksara": ["ꦥꦶ", "ꦤ꧀", "ꦠꦸ"]},
+      {"latin": "atap", "aksara": ["ꦄ", "ꦠ", "ꦥ꧀"]},
+      {"latin": "dahi", "aksara": ["ꦝ", "ꦲꦶ"]},
       {"latin": "mata", "aksara": ["ꦩ", "ꦠ"]},
       {"latin": "pipi", "aksara": ["ꦥꦶ", "ꦥꦶ"]},
-      {"latin": "dagu", "aksara": ["ꦢ", "ꦒꦸ"]},
+      {"latin": "dagu", "aksara": ["ꦝ", "ꦒꦸ"]},
       {"latin": "leher", "aksara": ["ꦭꦺ", "ꦲꦺꦂ"]},
-      {"latin": "dada", "aksara": ["ꦢ", "ꦢ"]},
+      {"latin": "dada", "aksara": ["ꦝ", "ꦝ"]},
       {"latin": "perut", "aksara": ["ꦥꦼ", "ꦫꦸ", "ꦠ꧀"]},
       {"latin": "kaki", "aksara": ["ꦏ", "ꦏꦶ"]},
       {"latin": "jari", "aksara": ["ꦗ", "ꦫꦶ"]},
       {"latin": "kuku", "aksara": ["ꦏꦸ", "ꦏꦸ"]},
       {"latin": "kulit", "aksara": ["ꦏꦸ", "ꦭꦶ", "ꦠ꧀"]},
-      {"latin": "darah", "aksara": ["ꦢ", "ꦫꦃ"]},
+      {"latin": "darah", "aksara": ["ꦝ", "ꦫꦃ"]},
       {"latin": "tulang", "aksara": ["ꦠꦸ", "ꦭꦁ"]},
       {"latin": "hati", "aksara": ["ꦲ", "ꦠꦶ"]},
       {"latin": "jiwa", "aksara": ["ꦗꦶ", "ꦮ"]},
       {"latin": "raga", "aksara": ["ꦫ", "ꦒ"]},
-      {"latin": "ibu", "aksara": ["ꦲꦶ", "ꦧꦸ"]},
-      {"latin": "ayah", "aksara": ["ꦲ", "ꦪꦃ"]},
-      {"latin": "anak", "aksara": ["ꦲ", "ꦤ", "ꦏ꧀"]},
+      {"latin": "ibu", "aksara": ["ꦆ", "ꦧꦸ"]},
+      {"latin": "ayah", "aksara": ["ꦄ", "ꦪꦃ"]},
+      {"latin": "anak", "aksara": ["ꦄ", "ꦤ", "ꦏ꧀"]},
       {"latin": "paman", "aksara": ["ꦥ", "ꦩ", "ꦤ꧀"]},
       {"latin": "bibi", "aksara": ["ꦧꦶ", "ꦧꦶ"]},
       {"latin": "kakek", "aksara": ["ꦏ", "ꦏꦺ", "ꦏ꧀"]},
       {"latin": "nenek", "aksara": ["ꦤꦺ", "ꦤꦺ", "ꦏ꧀"]},
-      {"latin": "desa", "aksara": ["ꦢꦺ", "ꦱ"]},
+      {"latin": "desa", "aksara": ["ꦝꦺ", "ꦱ"]},
       {"latin": "ratu", "aksara": ["ꦫ", "ꦠꦸ"]},
       {"latin": "patih", "aksara": ["ꦥ", "ꦠꦶꦃ"]},
       {"latin": "raja", "aksara": ["ꦫ", "ꦗ"]},
-      {"latin": "menteri", "aksara": ["ꦩꦼꦤ꧀", "ꦠꦼ", "ꦫꦶ"]},
-      {"latin": "tentara", "aksara": ["ꦠꦼꦤ꧀", "ꦠ", "ꦫ"]},
-      {"latin": "senjata", "aksara": ["ꦱꦼꦚ꧀", "ꦗ", "ꦠ"]},
+      {"latin": "menteri", "aksara": ["ꦩꦼ", "ꦤ꧀", "ꦠꦼ", "ꦫꦶ"]},
+      {"latin": "tentara", "aksara": ["ꦠꦼ", "ꦤ꧀", "ꦠ", "ꦫ"]},
+      {"latin": "senjata", "aksara": ["ꦱꦼ", "ꦤ꧀", "ꦗ", "ꦠ"]},
       {"latin": "panah", "aksara": ["ꦥ", "ꦤꦃ"]},
-      {"latin": "pedang", "aksara": ["ꦥꦼ", "ꦢꦁ"]},
-      {"latin": "perisai", "aksara": ["ꦥꦼ", "ꦫꦶ", "ꦱꦲꦶ"]},
+      {"latin": "pedang", "aksara": ["ꦥꦼ", "ꦝꦁ"]},
+      {"latin": "perisai", "aksara": ["ꦥꦼ", "ꦫꦶ", "ꦱꦻ"]},
       {"latin": "keris", "aksara": ["ꦏꦼ", "ꦫꦶ", "ꦱ꧀"]},
       {"latin": "makan", "aksara": ["ꦩ", "ꦏ", "ꦤ꧀"]},
       {"latin": "minum", "aksara": ["ꦩꦶ", "ꦤꦸ", "ꦩ꧀"]},
-      {"latin": "tidur", "aksara": ["ꦠꦶ", "ꦢꦸꦂ"]},
+      {"latin": "tidur", "aksara": ["ꦠꦶ", "ꦝꦸꦂ"]},
       {"latin": "jalan", "aksara": ["ꦗ", "ꦭ", "ꦤ꧀"]},
       {"latin": "lari", "aksara": ["ꦭ", "ꦫꦶ"]},
       {"latin": "terbang", "aksara": ["ꦠꦼꦂ", "ꦧꦁ"]},
       {"latin": "selam", "aksara": ["ꦱꦼ", "ꦭ", "ꦩ꧀"]},
-      {"latin": "mandi", "aksara": ["ꦩꦤ꧀", "ꦢꦶ"]},
+      {"latin": "mandi", "aksara": ["ꦩ", "ꦤ꧀", "ꦝꦶ"]},
       {"latin": "cuci", "aksara": ["ꦕꦸ", "ꦕꦶ"]},
       {"latin": "sapu", "aksara": ["ꦱ", "ꦥꦸ"]},
       {"latin": "baca", "aksara": ["ꦧ", "ꦕ"]},
       {"latin": "tulis", "aksara": ["ꦠꦸ", "ꦭꦶ", "ꦱ꧀"]},
       {"latin": "hitung", "aksara": ["ꦲꦶ", "ꦠꦸꦁ"]},
-      {"latin": "gambar", "aksara": ["ꦒꦩ꧀", "ꦧꦂ"]},
+      {"latin": "gambar", "aksara": ["ꦒ", "ꦩ꧀", "ꦧꦂ"]},
       {"latin": "nyanyi", "aksara": ["ꦚ", "ꦚꦶ"]},
       {"latin": "tari", "aksara": ["ꦠ", "ꦫꦶ"]},
       {"latin": "manis", "aksara": ["ꦩ", "ꦤꦶ", "ꦱ꧀"]},
       {"latin": "pahit", "aksara": ["ꦥ", "ꦲꦶ", "ꦠ꧀"]},
-      {"latin": "asin", "aksara": ["ꦲ", "ꦱꦶ", "ꦤ꧀"]},
-      {"latin": "pedas", "aksara": ["ꦥꦼ", "ꦢ", "ꦱ꧀"]},
+      {"latin": "asin", "aksara": ["ꦄ", "ꦱꦶ", "ꦤ꧀"]},
+      {"latin": "pedas", "aksara": ["ꦥꦼ", "ꦝ", "ꦱ꧀"]},
       {"latin": "gurih", "aksara": ["ꦒꦸ", "ꦫꦶꦃ"]},
-      {"latin": "asam", "aksara": ["ꦲ", "ꦱ", "ꦩ꧀"]},
+      {"latin": "asam", "aksara": ["ꦄ", "ꦱ", "ꦩ꧀"]},
       {"latin": "baik", "aksara": ["ꦧ", "ꦲꦶ", "ꦏ꧀"]},
-      {"latin": "indah", "aksara": ["ꦲꦶꦤ꧀", "ꦢꦃ"]},
+      {"latin": "indah", "aksara": ["ꦆ", "ꦤ꧀", "ꦝꦃ"]},
       {"latin": "canggih", "aksara": ["ꦕꦁ", "ꦒꦶꦃ"]},
       {"latin": "mega", "aksara": ["ꦩꦺ", "ꦒ"]},
-      {"latin": "citra", "aksara": ["ꦕꦶꦠ꧀", "ꦫ"]},
-      {"latin": "cakra", "aksara": ["ꦕ", "ꦏ꧀ꦫ"]},
+      {"latin": "citra", "aksara": ["ꦕꦶ", "ꦠꦿ"]},
+      {"latin": "cakra", "aksara": ["ꦕ", "ꦏꦿ"]},
       {"latin": "karsa", "aksara": ["ꦏꦂ", "ꦱ"]},
       {"latin": "karya", "aksara": ["ꦏꦂ", "ꦪ"]},
-      {"latin": "cipta", "aksara": ["ꦕꦶꦥ꧀", "ꦠ"]},
+      {"latin": "cipta", "aksara": ["ꦕꦶ", "ꦥ꧀", "ꦠ"]},
       {"latin": "rasa", "aksara": ["ꦫ", "ꦱ"]},
-      {"latin": "asih", "aksara": ["ꦲ", "ꦱꦶꦃ"]},
-      {"latin": "asuh", "aksara": ["ꦲ", "ꦱꦸꦃ"]},
-      {"latin": "bakti", "aksara": ["ꦧꦏ꧀", "ꦠꦶ"]},
+      {"latin": "asih", "aksara": ["ꦄ", "ꦱꦶꦃ"]},
+      {"latin": "asuh", "aksara": ["ꦄ", "ꦱꦸꦃ"]},
+      {"latin": "bakti", "aksara": ["ꦧ", "ꦏ꧀", "ꦠꦶ"]},
       {"latin": "suci", "aksara": ["ꦱꦸ", "ꦕꦶ"]},
-      {"latin": "darma", "aksara": ["ꦢꦂ", "ꦩ"]},
+      {"latin": "darma", "aksara": ["ꦝꦂ", "ꦩ"]},
       {"latin": "sepi", "aksara": ["ꦱꦼ", "ꦥꦶ"]}
     ];
 
-    const randomFillers = ["ꦏ", "ꦤ", "ꦠ", "ꦱ", "ꦩ", "ꦭ", "ꦥ", "ꦧ", "ꦗ", "ꦢ", "ꦒ", "ꦲ", "ꦏꦸ", "ꦤꦶ", "ꦠꦺ", "ꦱꦃ", "ꦩꦁ", "ꦭꦶ", "ꦥꦸ", "ꦧꦶ"];
+    const randomFillers = ["ꦏ", "ꦤ", "ꦠ", "ꦱ", "ꦩ", "ꦭ", "ꦥ", "ꦧ", "ꦗ", "ꦝ", "ꦒ", "ꦲ", "ꦏꦸ", "ꦤꦶ", "ꦠꦺ", "ꦱꦃ", "ꦩꦁ", "ꦭꦶ", "ꦥꦸ", "ꦧꦶ"];
 
     let gridSize = 7;
     let gridData = [];
     let placedWords = [];
     let selectedCells = [];
     let foundWordsCount = 0;
+    let activeHintWord = null;
+    let hintTimeout = null;
 
-    function startNewGame() {
-      // Acak ukuran grid antara 5x5 hingga 9x9
-      gridSize = Math.floor(Math.random() * 5) + 5; 
-      
-      // Jumlah kata disesuaikan dengan ukuran grid (5x5: 3, 6x6: 4, 7x7: 5, 8x8: 6, 9x9: 7)
-      const targetWordCount = gridSize - 2;
+    function startNewGame(isRandomTrigger = false) {
+      const selector = document.getElementById('grid-selector');
+      const selectedValue = selector.value;
 
-      document.getElementById('grid-info').innerText = `Grid: ${gridSize} x ${gridSize}`;
+      if (selectedValue === 'random' || isRandomTrigger) {
+        gridSize = Math.floor(Math.random() * 5) + 5;
+      } else {
+        gridSize = parseInt(selectedValue);
+      }
+
+      activeHintWord = null;
+      if (hintTimeout) clearTimeout(hintTimeout);
+
+      document.getElementById('grid-info').innerText = `Ukuran: ${gridSize} x ${gridSize}`;
       document.getElementById('btn-restart').style.display = 'none';
       document.getElementById('btn-hint').style.display = 'block';
       document.getElementById('hint-display').innerText = 'Klik "Petunjuk" jika butuh bantuan!';
@@ -351,24 +461,22 @@
       foundWordsCount = 0;
       placedWords = [];
 
-      buildGrid(targetWordCount);
+      buildGrid();
       renderGrid();
+      renderWordListUI();
       updateWordCountInfo();
     }
 
-    function buildGrid(targetWordCount) {
+    function buildGrid() {
       gridData = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
+      placedWords = [];
 
-      // Acak daftar kata dari database
       const shuffledWords = [...wordDatabase].sort(() => 0.5 - Math.random());
 
       for (let wordObj of shuffledWords) {
-        if (placedWords.length >= targetWordCount) break;
-
         const aksaraList = wordObj.aksara;
         if (aksaraList.length > gridSize) continue;
 
-        // Coba tempatkan kata secara horisontal atau vertikal
         const directions = ['horizontal', 'vertical'].sort(() => 0.5 - Math.random());
         let placed = false;
 
@@ -378,7 +486,7 @@
           const maxR = dir === 'vertical' ? gridSize - aksaraList.length : gridSize - 1;
           const maxC = dir === 'horizontal' ? gridSize - aksaraList.length : gridSize - 1;
 
-          for (let attempt = 0; attempt < 30; attempt++) {
+          for (let attempt = 0; attempt < 50; attempt++) {
             const r = Math.floor(Math.random() * (maxR + 1));
             const c = Math.floor(Math.random() * (maxC + 1));
 
@@ -404,7 +512,6 @@
         }
       }
 
-      // Isi sel kosong dengan aksara Jawa acak
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
           if (!gridData[r][c]) {
@@ -420,7 +527,6 @@
         const currC = dir === 'horizontal' ? c + i : c;
         const cellVal = gridData[currR][currC];
 
-        // Memungkinkan persilangan jika suku kata sama
         if (cellVal !== null && cellVal !== aksaraList[i]) {
           return false;
         }
@@ -433,8 +539,7 @@
       gridContainer.innerHTML = '';
       gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
 
-      // Hitung ukuran font secara dinamis agar pas di dalam kotak
-      const fontSize = Math.max(1, 2.4 - (gridSize * 0.18)) + 'rem';
+      const fontSize = (2.2 - (gridSize * 0.16)) + 'rem';
 
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
@@ -451,11 +556,46 @@
       }
     }
 
+    function renderWordListUI() {
+      const container = document.getElementById('word-list-badges');
+      container.innerHTML = '';
+
+      const sortedWords = [...placedWords].sort((a, b) => a.latin.localeCompare(b.latin));
+
+      sortedWords.forEach(word => {
+        const badge = document.createElement('span');
+        badge.className = 'word-badge' + (word.found ? ' found' : '');
+        badge.id = `badge-${word.latin}`;
+        badge.innerText = word.latin;
+        container.appendChild(badge);
+      });
+    }
+
+    function updateWordListUI() {
+      placedWords.forEach(word => {
+        const badge = document.getElementById(`badge-${word.latin}`);
+        if (badge) {
+          if (word.found) {
+            badge.classList.add('found');
+          } else {
+            badge.classList.remove('found');
+          }
+        }
+      });
+    }
+
     function handleCellClick(r, c, cellEl) {
+      if (activeHintWord && !activeHintWord.found) {
+        const startCell = activeHintWord.cells[0];
+        if (startCell.r === r && startCell.c === c) {
+          revealWord(activeHintWord);
+          return;
+        }
+      }
+
       const existingIdx = selectedCells.findIndex(cell => cell.r === r && cell.c === c);
 
       if (existingIdx !== -1) {
-        // Tekan ulang untuk membatalkan pilihan
         selectedCells.splice(existingIdx, 1);
         if (!isCellInCorrectWord(r, c)) {
           cellEl.classList.remove('selected');
@@ -475,37 +615,51 @@
         if (word.found) continue;
 
         if (word.cells.length === selectedCells.length) {
-          // Periksa arah maju
           const isForwardMatch = word.cells.every((cell, idx) => 
             cell.r === selectedCells[idx].r && cell.c === selectedCells[idx].c
           );
 
-          // Periksa arah mundur
           const isBackwardMatch = word.cells.every((cell, idx) => {
             const revIdx = selectedCells.length - 1 - idx;
             return cell.r === selectedCells[revIdx].r && cell.c === selectedCells[revIdx].c;
           });
 
           if (isForwardMatch || isBackwardMatch) {
-            word.found = true;
-            foundWordsCount++;
-            
-            // Tandai hijau permanen
-            selectedCells.forEach(sel => {
-              sel.el.classList.remove('selected');
-              sel.el.classList.add('correct');
-            });
-
-            selectedCells = [];
-            updateWordCountInfo();
-
-            if (foundWordsCount === placedWords.length) {
-              triggerWinSequence();
-            }
+            markWordAsFound(word);
             return;
           }
         }
       }
+    }
+
+    function markWordAsFound(word) {
+      word.found = true;
+      foundWordsCount++;
+
+      word.cells.forEach(cell => {
+        const idx = cell.r * gridSize + cell.c;
+        const el = document.getElementById('grid').children[idx];
+        el.classList.remove('selected', 'glow-red');
+        el.classList.add('correct');
+      });
+
+      selectedCells.forEach(sel => sel.el.classList.remove('selected'));
+      selectedCells = [];
+
+      updateWordListUI();
+      updateWordCountInfo();
+
+      document.getElementById('hint-display').innerText = `🎉 Berhasil menemukan kata: "${word.latin}"!`;
+
+      if (foundWordsCount === placedWords.length) {
+        triggerWinSequence();
+      }
+    }
+
+    function revealWord(word) {
+      markWordAsFound(word);
+      activeHintWord = null;
+      if (hintTimeout) clearTimeout(hintTimeout);
     }
 
     function isCellInCorrectWord(r, c) {
@@ -520,18 +674,31 @@
       const unfoundWords = placedWords.filter(w => !w.found);
       if (unfoundWords.length === 0) return;
 
-      const randomWord = unfoundWords[Math.floor(Math.random() * unfoundWords.length)];
-      const firstSyllable = randomWord.aksara[0];
-      
-      document.getElementById('hint-display').innerText = `Petunjuk: Ada kata diawali suku kata "${firstSyllable}"`;
+      activeHintWord = unfoundWords[Math.floor(Math.random() * unfoundWords.length)];
+      const startCellCoords = activeHintWord.cells[0];
+
+      const gridContainer = document.getElementById('grid');
+      const cells = gridContainer.children;
+      const targetIndex = startCellCoords.r * gridSize + startCellCoords.c;
+      const startCellEl = cells[targetIndex];
+
+      document.querySelectorAll('.cell.glow-red').forEach(el => el.classList.remove('glow-red'));
+      if (hintTimeout) clearTimeout(hintTimeout);
+
+      startCellEl.classList.add('glow-red');
+
+      document.getElementById('hint-display').innerText = `🔴 Kotak merah adalah awal kata! Tekan kotak itu untuk membuka kata.`;
+
+      hintTimeout = setTimeout(() => {
+        startCellEl.classList.remove('glow-red');
+      }, 2000);
     }
 
     function triggerWinSequence() {
-      document.getElementById('hint-display').innerText = '🎉 Selamat! Semua kata berhasil ditemukan!';
+      document.getElementById('hint-display').innerText = '🏆 Selamat! Seluruh kata berhasil ditemukan!';
       document.getElementById('btn-hint').style.display = 'none';
       document.getElementById('btn-restart').style.display = 'block';
 
-      // Sel non-kata menghilang, sel kata bersinar
       const allCells = document.querySelectorAll('.cell');
       allCells.forEach(cellEl => {
         const r = parseInt(cellEl.dataset.r);
@@ -545,8 +712,7 @@
       });
     }
 
-    // Jalankan permainan pertama saat halaman dimuat
-    startNewGame();
+    startNewGame(false);
   </script>
 </body>
 </html>
