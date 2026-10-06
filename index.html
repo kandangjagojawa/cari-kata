@@ -1,4 +1,4 @@
-<!-- VERSI TERBARU: KANDANGJAGO - FIXED HINT CLICK & REVEAL -->
+<!-- VERSI TERBARU: KANDANGJAGO - GOLD GLOW ON LATIN CLICK -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -163,8 +163,16 @@
       font-size: 0.8rem;
       font-weight: 700;
       color: #334155;
+      cursor: pointer;
+      user-select: none;
       transition: all 0.2s ease;
       box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .word-badge:hover {
+      border-color: #eab308;
+      color: #854d0e;
+      transform: translateY(-1px);
     }
 
     .word-badge.found {
@@ -173,6 +181,7 @@
       border-bottom-color: #4ade80;
       color: #15803d;
       text-decoration: line-through;
+      cursor: default;
       transform: translateY(1px);
     }
 
@@ -249,6 +258,7 @@
       }
     }
 
+    /* Animasi Petunjuk Red Glow */
     @keyframes pulseGlowRed {
       0% {
         box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444;
@@ -267,6 +277,28 @@
     .cell.glow-red {
       animation: pulseGlowRed 0.4s infinite alternate !important;
       color: #ffffff !important;
+      z-index: 10;
+    }
+
+    /* Animasi Glow Kuning Emas Saat Kata Latin Ditekan */
+    @keyframes pulseGlowGold {
+      0% {
+        box-shadow: 0 0 12px #eab308, 0 0 24px #facc15;
+        background: linear-gradient(180deg, #fef08a 0%, #facc15 100%);
+        border-color: #ca8a04;
+        border-bottom-color: #a16207;
+      }
+      100% {
+        box-shadow: 0 0 25px #ca8a04, 0 0 40px #eab308;
+        background: linear-gradient(180deg, #fde047 0%, #eab308 100%);
+        border-color: #854d0e;
+        border-bottom-color: #713f12;
+      }
+    }
+
+    .cell.glow-gold {
+      animation: pulseGlowGold 0.4s infinite alternate !important;
+      color: #713f12 !important;
       z-index: 10;
     }
 
@@ -394,7 +426,7 @@
     </div>
 
     <div class="word-list-container">
-      <div class="word-list-title">Daftar Kata (Bahasa Indonesia)</div>
+      <div class="word-list-title">Daftar Kata (Klik kata untuk melihat posisi)</div>
       <div id="word-list-badges" class="word-list-badges"></div>
     </div>
 
@@ -532,6 +564,7 @@
     
     let activeHintWord = null;
     let hintTimeout = null;
+    let goldGlowTimeout = null;
     let isHintGlowing = false; 
 
     function startNewGame(isRandomTrigger = false) {
@@ -545,6 +578,7 @@
       }
 
       clearHintState();
+      if (goldGlowTimeout) clearTimeout(goldGlowTimeout);
 
       document.getElementById('grid-info').innerText = `Ukuran: ${gridSize} x ${gridSize}`;
       document.getElementById('btn-restart').style.display = 'none';
@@ -715,8 +749,40 @@
         badge.className = 'word-badge' + (word.found ? ' found' : '');
         badge.id = `badge-${word.latin}`;
         badge.innerText = word.latin;
+
+        // FITUR BARU: Ketika kata Latin ditekan, kotak aksaranya menyala kuning emas 2 detik
+        badge.addEventListener('click', () => handleLatinWordClick(word));
+
         container.appendChild(badge);
       });
+    }
+
+    // Penanganan klik pada soal/badge kata Latin
+    function handleLatinWordClick(word) {
+      if (word.found) return; // Jika sudah terjawab, tidak perlu glow lagi
+
+      // Bersihkan efek glow-gold sebelumnya jika ada
+      document.querySelectorAll('.cell.glow-gold').forEach(el => el.classList.remove('glow-gold'));
+      if (goldGlowTimeout) clearTimeout(goldGlowTimeout);
+
+      // Tambahkan efek glow-gold pada seluruh sel aksara kata ini
+      word.cells.forEach(cell => {
+        const idx = cell.r * gridSize + cell.c;
+        const el = document.getElementById('grid').children[idx];
+        if (!el.classList.contains('correct')) {
+          el.classList.add('glow-gold');
+        }
+      });
+
+      document.getElementById('hint-display').innerText = `✨ Menampilkan lokasi kata "${word.latin}" selama 2 detik!`;
+
+      // Hilangkan glow kuning emas setelah tepat 2 detik
+      goldGlowTimeout = setTimeout(() => {
+        document.querySelectorAll('.cell.glow-gold').forEach(el => el.classList.remove('glow-gold'));
+        if (!isHintGlowing) {
+          document.getElementById('hint-display').innerText = 'Klik "Petunjuk" jika butuh bantuan!';
+        }
+      }, 2000);
     }
 
     function updateWordListUI() {
@@ -733,8 +799,6 @@
     }
 
     function handleCellClick(r, c, cellEl) {
-      // REVISI: Jika petunjuk SEDANG MENYALA MERAH dan kotak awal kata tersebut ditekan,
-      // langsung nyalakan seluruh kata menjadi HIJAU dan selesaikan kata tersebut.
       if (isHintGlowing && activeHintWord && !activeHintWord.found) {
         const startCell = activeHintWord.cells[0];
         if (startCell.r === r && startCell.c === c) {
@@ -743,7 +807,6 @@
         }
       }
 
-      // Jika petunjuk sudah padam (isHintGlowing === false), kotak berfungsi biasa
       const existingIdx = selectedCells.findIndex(cell => cell.r === r && cell.c === c);
 
       if (existingIdx !== -1) {
@@ -787,13 +850,12 @@
       word.found = true;
       foundWordsCount++;
 
-      // Mewarnai hijau & memberikan animasi 360 derajat
       word.cells.forEach((cell, index) => {
         const idx = cell.r * gridSize + cell.c;
         const el = document.getElementById('grid').children[idx];
         
         setTimeout(() => {
-          el.classList.remove('selected', 'glow-red');
+          el.classList.remove('selected', 'glow-red', 'glow-gold');
           el.classList.add('correct');
         }, index * 80);
       });
@@ -825,6 +887,7 @@
       activeHintWord = null;
       if (hintTimeout) clearTimeout(hintTimeout);
       document.querySelectorAll('.cell.glow-red').forEach(el => el.classList.remove('glow-red'));
+      document.querySelectorAll('.cell.glow-gold').forEach(el => el.classList.remove('glow-gold'));
     }
 
     function isCellInCorrectWord(r, c) {
@@ -856,11 +919,10 @@
 
       document.getElementById('hint-display').innerText = `🔴 Cepat! Tekan kotak berkedip merah sebelum 2 detik.`;
 
-      // Glow merah bertahan selama 2 detik
       hintTimeout = setTimeout(() => {
         startCellEl.classList.remove('glow-red');
         isHintGlowing = false;
-        activeHintWord = null; // Setelah 2 detik padam, ditekan tidak akan membuka kata
+        activeHintWord = null;
         document.getElementById('hint-display').innerText = 'Waktu petunjuk habis. Silakan coba lagi.';
       }, 2000);
     }
