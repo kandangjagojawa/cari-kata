@@ -1,4 +1,4 @@
-<!-- VERSI TERBARU: KANDANGJAGO 3D ANIMATED -->
+<!-- VERSI TERBARU: KANDANGJAGO - FIXED HINT CLICK & REVEAL -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -125,7 +125,6 @@
       padding: 0 0.25rem;
     }
 
-    /* Panel Daftar Kata Latin 3D */
     .word-list-container {
       width: 100%;
       background: #f8fafc;
@@ -177,7 +176,6 @@
       transform: translateY(1px);
     }
 
-    /* Kanvas Grid 3D */
     .grid-container {
       display: grid;
       gap: 8px;
@@ -194,7 +192,6 @@
       transition: all 0.3s ease;
     }
 
-    /* Efek Kotak Aksara 3D */
     .cell {
       background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
       border: 1px solid var(--cell-border);
@@ -231,7 +228,6 @@
       transform: translateY(1px);
     }
 
-    /* Animasi Putar 360 Derajat Saat Jawaban Benar */
     .cell.correct {
       background: linear-gradient(180deg, #86efac 0%, #4ade80 100%) !important;
       border-color: var(--cell-correct-border) !important;
@@ -253,7 +249,6 @@
       }
     }
 
-    /* Animasi Petunjuk Red Glow 3D */
     @keyframes pulseGlowRed {
       0% {
         box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444;
@@ -398,13 +393,11 @@
       <span id="word-count-info">Ditemukan: 0 / 0</span>
     </div>
 
-    <!-- Panel Daftar Kata Latin -->
     <div class="word-list-container">
       <div class="word-list-title">Daftar Kata (Bahasa Indonesia)</div>
       <div id="word-list-badges" class="word-list-badges"></div>
     </div>
 
-    <!-- Kanvas Grid 3D -->
     <div id="grid" class="grid-container"></div>
 
     <div id="hint-display" class="hint-box">Klik "Petunjuk" jika butuh bantuan!</div>
@@ -418,7 +411,6 @@
   </div>
 
   <script>
-    // Database 100 Kata Dasar Bahasa Indonesia
     const wordDatabase = [
       {"latin": "air", "aksara": ["ꦄ", "ꦲꦶꦂ"]},
       {"latin": "api", "aksara": ["ꦄ", "ꦥꦶ"]},
@@ -524,7 +516,6 @@
 
     const randomFillers = ["ꦏ", "ꦤ", "ꦠ", "ꦱ", "ꦩ", "ꦭ", "ꦥ", "ꦧ", "ꦗ", "ꦝ", "ꦒ", "ꦲ", "ꦏꦸ", "ꦤꦶ", "ꦠꦺ", "ꦱꦃ", "ꦩꦁ", "ꦭꦶ", "ꦥꦸ", "ꦧꦶ"];
 
-    // 5 Arah Susunan Kata
     const directions = [
       { dr: 0, dc: 1 },  // Kiri ke kanan
       { dr: 1, dc: 0 },  // Atas ke bawah
@@ -553,9 +544,7 @@
         gridSize = parseInt(selectedValue);
       }
 
-      activeHintWord = null;
-      isHintGlowing = false;
-      if (hintTimeout) clearTimeout(hintTimeout);
+      clearHintState();
 
       document.getElementById('grid-info').innerText = `Ukuran: ${gridSize} x ${gridSize}`;
       document.getElementById('btn-restart').style.display = 'none';
@@ -620,17 +609,59 @@
         }
       }
 
-      // Sel sisanya (sekitar 50%) diisi aksara acak sebagai pengecoh
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
           if (!gridData[r][c]) {
-            gridData[r][c] = randomFillers[Math.floor(Math.random() * randomFillers.length)];
+            gridData[r][c] = getSafeFiller(r, c);
           }
         }
       }
     }
 
-    // Tanpa persilangan (No Crossing)
+    function getSafeFiller(r, c) {
+      const shuffledFillers = [...randomFillers].sort(() => 0.5 - Math.random());
+
+      for (let filler of shuffledFillers) {
+        gridData[r][c] = filler;
+
+        let createsFakeWord = false;
+        
+        for (let word of placedWords) {
+          for (let dirObj of directions) {
+            if (checkWordAtLocation(word.aksara, r, c, dirObj.dr, dirObj.dc)) {
+              createsFakeWord = true;
+              break;
+            }
+          }
+          if (createsFakeWord) break;
+        }
+
+        if (!createsFakeWord) {
+          return filler;
+        }
+      }
+
+      gridData[r][c] = null;
+      return "ꦏ";
+    }
+
+    function checkWordAtLocation(aksaraList, r, c, dr, dc) {
+      const len = aksaraList.length;
+      for (let i = 0; i < len; i++) {
+        const currR = r + i * dr;
+        const currC = c + i * dc;
+
+        if (currR < 0 || currR >= gridSize || currC < 0 || currC >= gridSize) {
+          return false;
+        }
+
+        if (gridData[currR][currC] !== aksaraList[i]) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     function canPlaceWord(aksaraList, r, c, dr, dc) {
       const len = aksaraList.length;
       const endR = r + (len - 1) * dr;
@@ -702,6 +733,8 @@
     }
 
     function handleCellClick(r, c, cellEl) {
+      // REVISI: Jika petunjuk SEDANG MENYALA MERAH dan kotak awal kata tersebut ditekan,
+      // langsung nyalakan seluruh kata menjadi HIJAU dan selesaikan kata tersebut.
       if (isHintGlowing && activeHintWord && !activeHintWord.found) {
         const startCell = activeHintWord.cells[0];
         if (startCell.r === r && startCell.c === c) {
@@ -710,6 +743,7 @@
         }
       }
 
+      // Jika petunjuk sudah padam (isHintGlowing === false), kotak berfungsi biasa
       const existingIdx = selectedCells.findIndex(cell => cell.r === r && cell.c === c);
 
       if (existingIdx !== -1) {
@@ -753,12 +787,11 @@
       word.found = true;
       foundWordsCount++;
 
-      // Memberikan efek warna hijau dan animasi putar 360 derajat (flipCorrect)
+      // Mewarnai hijau & memberikan animasi 360 derajat
       word.cells.forEach((cell, index) => {
         const idx = cell.r * gridSize + cell.c;
         const el = document.getElementById('grid').children[idx];
         
-        // Stagger animasi putar sedikit berurutan agar estetik
         setTimeout(() => {
           el.classList.remove('selected', 'glow-red');
           el.classList.add('correct');
@@ -823,10 +856,11 @@
 
       document.getElementById('hint-display').innerText = `🔴 Cepat! Tekan kotak berkedip merah sebelum 2 detik.`;
 
+      // Glow merah bertahan selama 2 detik
       hintTimeout = setTimeout(() => {
         startCellEl.classList.remove('glow-red');
         isHintGlowing = false;
-        activeHintWord = null;
+        activeHintWord = null; // Setelah 2 detik padam, ditekan tidak akan membuka kata
         document.getElementById('hint-display').innerText = 'Waktu petunjuk habis. Silakan coba lagi.';
       }, 2000);
     }
