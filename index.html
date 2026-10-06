@@ -1,3 +1,4 @@
+<!-- VERSI TERBARU: KANDANGJAGO -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -103,7 +104,6 @@
       padding: 0 0.25rem;
     }
 
-    /* Panel Daftar Kata Latin */
     .word-list-container {
       width: 100%;
       background: #f8fafc;
@@ -149,7 +149,6 @@
       text-decoration: line-through;
     }
 
-    /* Grid Area */
     .grid-container {
       display: grid;
       gap: 6px;
@@ -195,7 +194,6 @@
       color: #064e3b;
     }
 
-    /* Animasi Petunjuk Red Glow */
     @keyframes pulseGlowRed {
       0% {
         box-shadow: 0 0 8px #ef4444, 0 0 16px #ef4444;
@@ -281,6 +279,15 @@
     .btn-restart:hover {
       background: var(--primary-hover);
     }
+
+    footer {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #64748b;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
   </style>
 </head>
 <body>
@@ -322,10 +329,13 @@
       <button id="btn-hint" class="btn-hint" onclick="getHint()">💡 Petunjuk</button>
       <button id="btn-restart" class="btn-restart" onclick="startNewGame(true)">🎮 Main Lagi</button>
     </div>
+
+    <!-- Footer Tambahan -->
+    <footer>Dari KANDANGJAGO untuk Nusantara</footer>
   </div>
 
   <script>
-    // Database 100 Kata Dasar Bahasa Indonesia tanpa vokal 'O'
+    // Database 100 Kata Dasar Bahasa Indonesia
     const wordDatabase = [
       {"latin": "air", "aksara": ["ꦄ", "ꦲꦶꦂ"]},
       {"latin": "api", "aksara": ["ꦄ", "ꦥꦶ"]},
@@ -431,13 +441,25 @@
 
     const randomFillers = ["ꦏ", "ꦤ", "ꦠ", "ꦱ", "ꦩ", "ꦭ", "ꦥ", "ꦧ", "ꦗ", "ꦝ", "ꦒ", "ꦲ", "ꦏꦸ", "ꦤꦶ", "ꦠꦺ", "ꦱꦃ", "ꦩꦁ", "ꦭꦶ", "ꦥꦸ", "ꦧꦶ"];
 
+    // Aturan 5: Lima Arah Susunan Kata
+    const directions = [
+      { dr: 0, dc: 1 },  // Kiri ke kanan
+      { dr: 1, dc: 0 },  // Atas ke bawah
+      { dr: -1, dc: 0 }, // Bawah ke atas
+      { dr: -1, dc: 1 }, // Diagonal kanan atas
+      { dr: 1, dc: 1 }   // Diagonal kanan bawah
+    ];
+
     let gridSize = 7;
     let gridData = [];
     let placedWords = [];
     let selectedCells = [];
     let foundWordsCount = 0;
+    
+    // Variabel untuk fitur hint
     let activeHintWord = null;
     let hintTimeout = null;
+    let isHintGlowing = false; 
 
     function startNewGame(isRandomTrigger = false) {
       const selector = document.getElementById('grid-selector');
@@ -449,7 +471,9 @@
         gridSize = parseInt(selectedValue);
       }
 
+      // Reset state petunjuk
       activeHintWord = null;
+      isHintGlowing = false;
       if (hintTimeout) clearTimeout(hintTimeout);
 
       document.getElementById('grid-info').innerText = `Ukuran: ${gridSize} x ${gridSize}`;
@@ -471,30 +495,36 @@
       gridData = Array(gridSize).fill(null).map(() => Array(gridSize).fill(null));
       placedWords = [];
 
+      const totalCells = gridSize * gridSize;
+      
+      // Aturan 3: 40% s.d. 60% grid adalah aksara random pengecoh. 
+      // Artinya maksimal kotak yang terisi kata adalah sekitar 45% - 55% dari total kotak.
+      const maxWordCells = Math.floor(totalCells * 0.50); 
+      let currentWordCellsCount = 0;
+
       const shuffledWords = [...wordDatabase].sort(() => 0.5 - Math.random());
 
       for (let wordObj of shuffledWords) {
         const aksaraList = wordObj.aksara;
-        if (aksaraList.length > gridSize) continue;
+        
+        // Lewati jika penambahan kata ini membuat jumlah kotak kata melebihi batas (menyisakan <50% untuk pengecoh)
+        if (currentWordCellsCount + aksaraList.length > maxWordCells) continue;
 
-        const directions = ['horizontal', 'vertical'].sort(() => 0.5 - Math.random());
+        const shufDirs = [...directions].sort(() => 0.5 - Math.random());
         let placed = false;
 
-        for (let dir of directions) {
+        for (let dirObj of shufDirs) {
           if (placed) break;
 
-          const maxR = dir === 'vertical' ? gridSize - aksaraList.length : gridSize - 1;
-          const maxC = dir === 'horizontal' ? gridSize - aksaraList.length : gridSize - 1;
-
           for (let attempt = 0; attempt < 50; attempt++) {
-            const r = Math.floor(Math.random() * (maxR + 1));
-            const c = Math.floor(Math.random() * (maxC + 1));
+            const r = Math.floor(Math.random() * gridSize);
+            const c = Math.floor(Math.random() * gridSize);
 
-            if (canPlaceWord(aksaraList, r, c, dir)) {
+            if (canPlaceWord(aksaraList, r, c, dirObj.dr, dirObj.dc)) {
               const wordCells = [];
               for (let i = 0; i < aksaraList.length; i++) {
-                const currR = dir === 'vertical' ? r + i : r;
-                const currC = dir === 'horizontal' ? c + i : c;
+                const currR = r + i * dirObj.dr;
+                const currC = c + i * dirObj.dc;
                 gridData[currR][currC] = aksaraList[i];
                 wordCells.push({ r: currR, c: currC });
               }
@@ -505,6 +535,7 @@
                 found: false
               });
 
+              currentWordCellsCount += aksaraList.length;
               placed = true;
               break;
             }
@@ -512,6 +543,7 @@
         }
       }
 
+      // Isi sel kosong (sekitar 50%) dengan aksara acak sebagai pengecoh
       for (let r = 0; r < gridSize; r++) {
         for (let c = 0; c < gridSize; c++) {
           if (!gridData[r][c]) {
@@ -521,13 +553,24 @@
       }
     }
 
-    function canPlaceWord(aksaraList, r, c, dir) {
-      for (let i = 0; i < aksaraList.length; i++) {
-        const currR = dir === 'vertical' ? r + i : r;
-        const currC = dir === 'horizontal' ? c + i : c;
-        const cellVal = gridData[currR][currC];
+    // Aturan 4: Tidak Boleh Ada Persilangan (No Crossing).
+    // Setiap kotak hanya boleh dipakai 1 kali.
+    function canPlaceWord(aksaraList, r, c, dr, dc) {
+      const len = aksaraList.length;
+      const endR = r + (len - 1) * dr;
+      const endC = c + (len - 1) * dc;
 
-        if (cellVal !== null && cellVal !== aksaraList[i]) {
+      // Cek apakah melewati batas grid
+      if (endR < 0 || endR >= gridSize || endC < 0 || endC >= gridSize) {
+        return false;
+      }
+
+      for (let i = 0; i < len; i++) {
+        const currR = r + i * dr;
+        const currC = c + i * dc;
+        
+        // Kotak harus BENAR-BENAR KOSONG (null), tidak boleh menimpa atau menyilang kata lain
+        if (gridData[currR][currC] !== null) {
           return false;
         }
       }
@@ -585,7 +628,8 @@
     }
 
     function handleCellClick(r, c, cellEl) {
-      if (activeHintWord && !activeHintWord.found) {
+      // Aturan 2: Jika petunjuk SEDANG MENYALA dan kotak ditekan, otomatis terbuka
+      if (isHintGlowing && activeHintWord && !activeHintWord.found) {
         const startCell = activeHintWord.cells[0];
         if (startCell.r === r && startCell.c === c) {
           revealWord(activeHintWord);
@@ -593,6 +637,7 @@
         }
       }
 
+      // Jika petunjuk mati, kotak berfungsi seperti biasa
       const existingIdx = selectedCells.findIndex(cell => cell.r === r && cell.c === c);
 
       if (existingIdx !== -1) {
@@ -651,6 +696,11 @@
 
       document.getElementById('hint-display').innerText = `🎉 Berhasil menemukan kata: "${word.latin}"!`;
 
+      // Matikan status hint jika kata tersebut tidak sengaja ditebak saat hint menyala
+      if (activeHintWord && activeHintWord.latin === word.latin) {
+         clearHintState();
+      }
+
       if (foundWordsCount === placedWords.length) {
         triggerWinSequence();
       }
@@ -658,8 +708,14 @@
 
     function revealWord(word) {
       markWordAsFound(word);
+      clearHintState();
+    }
+
+    function clearHintState() {
+      isHintGlowing = false;
       activeHintWord = null;
       if (hintTimeout) clearTimeout(hintTimeout);
+      document.querySelectorAll('.cell.glow-red').forEach(el => el.classList.remove('glow-red'));
     }
 
     function isCellInCorrectWord(r, c) {
@@ -671,6 +727,9 @@
     }
 
     function getHint() {
+      // Cegah spam tombol jika hint sedang aktif
+      if (isHintGlowing) return;
+
       const unfoundWords = placedWords.filter(w => !w.found);
       if (unfoundWords.length === 0) return;
 
@@ -682,15 +741,19 @@
       const targetIndex = startCellCoords.r * gridSize + startCellCoords.c;
       const startCellEl = cells[targetIndex];
 
-      document.querySelectorAll('.cell.glow-red').forEach(el => el.classList.remove('glow-red'));
-      if (hintTimeout) clearTimeout(hintTimeout);
+      clearHintState();
 
+      isHintGlowing = true;
       startCellEl.classList.add('glow-red');
 
-      document.getElementById('hint-display').innerText = `🔴 Kotak merah adalah awal kata! Tekan kotak itu untuk membuka kata.`;
+      document.getElementById('hint-display').innerText = `🔴 Cepat! Tekan kotak berkedip merah sebelum 2 detik.`;
 
+      // Aturan 2: Glow menyala tepat 2 detik. Jika lewat, activeHintWord jadi null lagi.
       hintTimeout = setTimeout(() => {
         startCellEl.classList.remove('glow-red');
+        isHintGlowing = false;
+        activeHintWord = null; // Lewat 2 detik, petunjuk kadaluarsa
+        document.getElementById('hint-display').innerText = 'Waktu petunjuk habis. Silakan coba lagi.';
       }, 2000);
     }
 
